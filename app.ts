@@ -36,34 +36,32 @@ const posts = [
   }
 ];
 
-interface dataType {
+interface dataItem {
   id: string
   title: string
   body: string
 }
 
-interface byIdType {
-  [id: string]: object
-}
-
-interface normalizedType {
-  byId: byIdType
+interface dataType<T> {
+  byId: {
+    [key: string]: T
+  },
   allIds: string[]
 }
 
-const normalizeData = (unnormalizedData: dataType[]) => {
-  let normalizedData: normalizedType = { byId: {}, allIds: [] }
-
-  normalizedData.byId = unnormalizedData.reduce((result, netxElement) => {
-    result[netxElement.id] = { ...netxElement }
-    return result;
-  }, {})
-
-  normalizedData.allIds = Object.keys(normalizedData.byId);
-  return normalizedData;
+const normalizedData = <T extends dataItem>(unnormalizedData: T[]) => {
+  const result: dataType<object> = { byId: {}, allIds: []}
+  unnormalizedData.map((data: T) => {
+    result.byId = {
+      ...result.byId,
+      [data.id]: data
+    }
+    result.allIds = [...result.allIds, data.id];
+  })
+  return result;
 };
 
-console.log(normalizeData(posts));
+console.log(normalizedData(posts));
 
 
 
